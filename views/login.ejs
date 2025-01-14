@@ -1,1 +1,58 @@
-        
+ <!DOCTYPE html  >
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+                      margin: 0;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      input {
+        margin: 5px;
+        padding: 5px;
+      }
+      button {
+        margin: 5px;
+        padding: 5px;
+      }
+    </style>
+
+  </head>
+  <!-- make a login page that has 2 buttons sign up and login pressing it reduxts you to the page -->
+  <div>
+    <button>Sign Up</button>
+    <button>Login</button>
+  </div>
+  <div>
+    <form action="/login" method="POST">
+      <input type="text" name="username" placeholder="username">
+      <input type="password" name="password" placeholder="password">
+      <button type="submit">Login</button>
+    </form>
+  </div>
+  <div>
+    <form action="/signup" method="POST">
+      <input type="text" name="username" placeholder="username">
+      <input type="password" name="password" placeholder="password">
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+  <div>
+    <form action="/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+  </div>
+  
+  <body>
+    
+  </body>
+  </html>        
