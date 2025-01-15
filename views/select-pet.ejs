@@ -16,10 +16,11 @@
     }
     .container {
       background-color: #fff;
-      padding: 20px;
+      padding: 35px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
+      
     }
     h2 {
       margin-bottom: 20px;
@@ -31,7 +32,7 @@
     }
     .pet-option {
       display: flex;
-      flex-direction: column;
+      justify-content: space-around;
       align-items: center;
     }
     input[type="radio"] {
@@ -53,6 +54,7 @@
       font-size: 16px;
       width: 100%;
       max-width: 300px;
+      text-align: absolute;
     }
     button {
       background-color: #007bff;
@@ -62,6 +64,18 @@
     }
     button:hover {
       background-color: #0056b3;
+    }
+
+    .pet_name {
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+      align-items: center;
+      text-align: center;
     }
   </style>
 </head>
@@ -81,7 +95,7 @@
         </div>
         <div class="pet-option">
           <input type="radio" id="petc" name="pet_type" value="petc" required>
-          <label for="petc1"><img src="/images/petc.png" alt="Pet C1"></label>
+          <label for="petc"><img src="/images/petc.png" alt="Pet C1"></label>
         </div>
         <div class="pet-option">
           <input type="radio" id="petd" name="pet_type" value="petd" required>
