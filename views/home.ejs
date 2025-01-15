@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
     }
+
     .container {
       background-color: #fff;
       padding: 20px;
@@ -21,20 +23,33 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
-    h1, h2 {
+
+    h1,
+    h2 {
       margin-bottom: 20px;
     }
+
     img {
-      width: 300px; /* Increase the width */
-      height: 300px; /* Increase the height */
+      max-width: 300px;
+      /* Set the maximum width */
+      max-height: 300px;
+      /* Set the maximum height */
+      width: 100%;
+      /* Maintain aspect ratio */
+      height: 100%;
+      /* Maintain aspect ratio */
+      object-fit: contain;
+      /* Maintain aspect ratio and fit within the container */
       margin-bottom: 20px;
     }
+
     .actions {
       display: flex;
       justify-content: space-around;
       width: 100%;
       margin-bottom: 20px;
     }
+
     button {
       margin: 10px;
       padding: 10px 20px;
@@ -46,44 +61,62 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
+
     button:hover {
       background-color: #0056b3;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Welcome <%= user %>!</h1>
     <h2>Your Pet</h2>
-    <% let petImage = `/images/${pet.pet_type.toLowerCase()}.png`; %>
-    <% if (pet.outfit === 'Top Hat') { %>
-      <% petImage = `/images/${pet.pet_type.toLowerCase()}2.png`; %>
-    <% } else if (pet.outfit === 'Sunglasses') { %>
-      <% petImage = `/images/${pet.pet_type.toLowerCase()}3.png`; %>
-    <% } %>
-    <img src="<%= petImage %>" alt="<%= pet.pet_type %>">
-    <p>Name: <%= pet.pet_name %></p>
-    <p>Hunger: <%= pet.hunger %></p>
-    <p>Happiness: <%= pet.happiness %></p>
-    <p>Outfit: <%= pet.outfit %></p>
-    <p>Personality: <%= pet.personality %></p>
-    <p>Coins: <%= pet.coins %></p>
-    <div class="actions">
-      <form action="/feed" method="POST">
-        <button type="submit">Feed</button>
-      </form>
-      <form action="/pet" method="POST">
-        <button type="submit">Pet</button>
-      </form>
-      <form action="/change-outfit" method="POST">
-        <select name="outfit" required>
-          <% ownedOutfits.forEach(outfit => { %>
-            <option value="<%= outfit %>" <%= pet.outfit === outfit ? 'selected' : '' %>><%= outfit.charAt(0).toUpperCase() + outfit.slice(1) %></option>
-          <% }); %>
-        </select>
-        <button type="submit">Change Outfit</button>
-      </form>
-    </div>
+    <% let petImage=`/images/${pet.pet_type.toLowerCase()}.png`; %>
+      <% if (pet.current_outfit==='Top Hat' ) { %>
+        <% petImage=`/images/${pet.pet_type.toLowerCase()}2.png`; %>
+          <% } else if (pet.current_outfit==='Sunglasses' ) { %>
+            <% petImage=`/images/${pet.pet_type.toLowerCase()}3.png`; %>
+              <% } %>
+                <img src="<%= petImage %>" alt="<%= pet.pet_type %>">
+                <p>Name: <%= pet.pet_name %>
+                </p>
+                <p>Hunger: <%= pet.hunger %>
+                </p>
+                <p>Happiness: <%= pet.happiness %>
+                </p>
+                <p>Outfit: <%= pet.current_outfit %>
+                </p>
+                <p>Personality: <%= pet.personality %>
+                </p>
+                <p>Coins: <%= pet.coins %>
+                </p>
+                <div class="actions">
+                  <form action="/feed" method="POST">
+                    <button type="submit">Feed</button>
+                  </form>
+                  <form action="/pet" method="POST">
+                    <button type="submit">Pet</button>
+                  </form>
+                  <form action="/play" method="POST">
+                    <button type="submit">Play</button>
+                  </form>
+                  <form action="/shop" method="GET">
+                    <button type="submit">Shop</button>
+                  </form>
+                  <form action="/change-outfit" method="POST">
+                    <select name="outfit" required>
+                      <option value="default" <%=pet.current_outfit==='default' ? 'selected' : '' %>>Default</option>
+                      <% ownedOutfits.forEach(outfit=> { %>
+                        <option value="<%= outfit %>" <%=pet.current_outfit===outfit ? 'selected' : '' %>><%=
+                            outfit.charAt(0).toUpperCase() + outfit.slice(1) %>
+                        </option>
+                        <% }); %>
+                    </select>
+                    <button type="submit">Change Outfit</button>
+                  </form>
+                </div>
   </div>
 </body>
+
 </html>
