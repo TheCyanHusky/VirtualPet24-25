@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Home</title>
   <style>
     body {
       display: flex;
@@ -21,22 +21,8 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
-    h2 {
+    h1 {
       margin-bottom: 20px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    input {
-      margin: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 300px;
     }
     button {
       margin: 10px;
@@ -56,12 +42,9 @@
 </head>
 <body>
   <div class="container">
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
+    <h1>Welcome!</h1>
+    <button onclick="window.location.href='/login'">Login</button>
+    <button onclick="window.location.href='/signup'">Sign Up</button>
   </div>
 </body>
 </html>

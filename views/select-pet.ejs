@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Your Pet</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .pet-options {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .pet-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input[type="radio"] {
+      display: none;
+    }
+    input[type="radio"]:checked + label img {
+      border: 2px solid #000;
+    }
+    label img {
+      max-width: 100px;
+      cursor: pointer;
+      transition: border 0.3s;
+    }
+    input[type="text"], button {
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Select Your Pet</h2>
+    <form action="/select-pet" method="POST">
+      <input type="text" name="pet_name" placeholder="Pet Name" required>
+      <div class="pet-options">
+        <div class="pet-option">
+          <input type="radio" id="peta" name="pet_type" value="peta" required>
+          <label for="peta"><img src="/images/peta.png" alt="Pet A1"></label>
+        </div>
+        <div class="pet-option">
+          <input type="radio" id="petb" name="pet_type" value="petb" required>
+          <label for="petb"><img src="/images/petb.png" alt="Pet B1"></label>
+        </div>
+        <div class="pet-option">
+          <input type="radio" id="petc" name="pet_type" value="petc" required>
+          <label for="petc1"><img src="/images/petc.png" alt="Pet C1"></label>
+        </div>
+        <div class="pet-option">
+          <input type="radio" id="petd" name="pet_type" value="petd" required>
+          <label for="petd"><img src="/images/petd.png" alt="Pet D1"></label>
+        </div>
+      </div>
+      <button type="submit">Select Pet</button>
+    </form>
+  </div>
+</body>
+</html>

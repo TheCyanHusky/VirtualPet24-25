@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Shop</title>
   <style>
     body {
       display: flex;
@@ -24,19 +24,16 @@
     h2 {
       margin-bottom: 20px;
     }
-    form {
+    .outfit-options {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .outfit-option {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-    input {
-      margin: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 300px;
     }
     button {
       margin: 10px;
@@ -56,11 +53,23 @@
 </head>
 <body>
   <div class="container">
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login</button>
+    <h2>Shop</h2>
+    <p>Select an outfit for your pet (10 coins each):</p>
+    <form action="/shop" method="POST">
+      <div class="outfit-options">
+        <div class="outfit-option">
+          <input type="radio" id="tophat" name="outfit" value="Top Hat" required>
+          <label for="tophat">Top Hat</label>
+        </div>
+        <div class="outfit-option">
+          <input type="radio" id="sunglasses" name="outfit" value="Sunglasses" required>
+          <label for="sunglasses">Sunglasses</label>
+        </div>
+      </div>
+      <button type="submit">Buy Outfit</button>
+    </form>
+    <form action="/home" method="GET">
+      <button type="submit">Back to Home</button>
     </form>
   </div>
 </body>
