@@ -34,7 +34,8 @@ db.serialize(() => {
     personality TEXT,
     coins INTEGER DEFAULT 0,
     current_outfit TEXT DEFAULT 'none',
-    owned_outfits TEXT DEFAULT 'default'
+    owned_outfits TEXT DEFAULT 'default',
+    inventory TEXT DEFAULT '[]'
   )`);
 });
 
@@ -49,6 +50,86 @@ app.get('/login', (req, res) => {
 app.get('/signup', (req, res) => {
   res.render('signup');
 });
+
+// Function to decrease hunger and happiness based on personality
+function decreaseHungerAndHappiness() {
+  db.all("SELECT username, personality, hunger, happiness FROM pets", (err, rows) => {
+    if (err) {
+      console.error("Database error:", err);
+      return;
+    }
+
+    rows.forEach(row => {
+      let hungerDecrease = 2;
+      let happinessDecrease = 2;
+
+      switch (row.personality) {
+        case 'Playful':
+          happinessDecrease = 1;
+          break;
+        case 'Lazy':
+          hungerDecrease = 3;
+          happinessDecrease = 1;
+          break;
+        case 'Curious':
+          hungerDecrease = 1;
+          happinessDecrease = 3;
+          break;
+        case 'Energetic':
+          hungerDecrease = 4;
+          happinessDecrease = 1;
+          break;
+        case 'Calm':
+          hungerDecrease = 1;
+          happinessDecrease = 1;
+          break;
+        case 'Greedy':
+          hungerDecrease = 5;
+          happinessDecrease = 2;
+          break;
+        case 'Cheerful':
+          hungerDecrease = 2;
+          happinessDecrease = 1;
+          break;
+        case 'Depressed':
+          hungerDecrease = 5;
+          happinessDecrease = 10;
+          break;
+        default:
+          break;
+      }
+
+      const newHunger = Math.max(row.hunger - hungerDecrease, 0);
+      const newHappiness = Math.max(row.happiness - happinessDecrease, 0);
+
+      db.run("UPDATE pets SET hunger = ?, happiness = ? WHERE username = ?", [newHunger, newHappiness, row.username], (err) => {
+        if (err) {
+          console.error("Database error:", err);
+        } else {
+          console.log(`Updated ${row.username}: Hunger=${newHunger}, Happiness=${newHappiness}`);
+        }
+      });
+    });
+  });
+}
+
+app.get('/pet-status', (req, res) => {
+  if (req.session.user) {
+    db.get("SELECT hunger, happiness FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        console.error("Database error:", err);
+        res.status(500).send('Error occurred');
+      } else {
+        res.json({ hunger: row.hunger, happiness: row.happiness });
+      }
+    });
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+});
+
+// Run the decreaseHungerAndHappiness function every 20 seconds
+setInterval(decreaseHungerAndHappiness, 20000);
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -102,7 +183,7 @@ app.get('/select-pet', (req, res) => {
 
 app.post('/select-pet', (req, res) => {
   const { pet_name, pet_type } = req.body;
-  const personalityTraits = ['Friendly', 'Playful', 'Lazy', 'Curious'];
+  const personalityTraits = ['Friendly', 'Playful', 'Lazy', 'Curious', 'Energetic', 'Calm', 'Greedy', 'Cheerful', 'Depressed'];
   const personality = personalityTraits[Math.floor(Math.random() * personalityTraits.length)];
   if (req.session.user) {
     db.run("INSERT INTO pets (username, pet_name, pet_type, hunger, happiness, personality, coins) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -206,13 +287,113 @@ app.post('/shop', (req, res) => {
   }
 });
 
-app.post('/feed', (req, res) => {
+app.get('/food-shop', (req, res) => {
   if (req.session.user) {
-    db.run("UPDATE pets SET hunger = hunger + 10 WHERE username = ?", [req.session.user], (err) => {
+    res.render('food-shop');
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.post('/food-shop', (req, res) => {
+  const { food } = req.body;
+  if (req.session.user) {
+    db.get("SELECT coins, inventory FROM pets WHERE username = ?", [req.session.user], (err, row) => {
       if (err) {
-        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+        console.error("Database error:", err);
+        res.send('Error occurred. <a href="/food-shop">Try again</a>');
+      } else if (row) {
+        let cost;
+        switch (food) {
+          case 'Apple':
+            cost = 6;
+            break;
+          case 'Cookie':
+            cost = 12;
+            break;
+          case 'Pizza':
+            cost = 20;
+            break;
+          default:
+            res.send('Invalid food item. <a href="/food-shop">Try again</a>');
+            return;
+        }
+
+        if (row.coins >= cost) {
+          const inventory = row.inventory ? JSON.parse(row.inventory) : [];
+          inventory.push(food);
+          console.log('Updated Inventory:', inventory); // Debugging
+          db.run("UPDATE pets SET coins = coins - ?, inventory = ? WHERE username = ?", [cost, JSON.stringify(inventory), req.session.user], (err) => {
+            if (err) {
+              console.error("Database error:", err);
+              res.send('Error occurred. <a href="/food-shop">Try again</a>');
+            } else {
+              res.redirect('/home');
+            }
+          });
+        } else {
+          res.send('Not enough coins. <a href="/food-shop">Try again</a>');
+        }
       } else {
-        res.redirect('/home');
+        res.send('User not found. <a href="/food-shop">Try again</a>');
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.post('/feed', (req, res) => {
+  const { food } = req.body;
+  if (req.session.user) {
+    db.get("SELECT hunger, happiness, inventory FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        console.error("Database error:", err);
+        res.send('Error occurred. <a href="/home">Try again</a>');
+      } else if (row) {
+        if (row.hunger >= 100) {
+          res.send('Your pet is already full. <a href="/home">Go back</a>');
+          return;
+        }
+
+        let inventory = row.inventory ? JSON.parse(row.inventory) : [];
+        const foodIndex = inventory.indexOf(food);
+        if (foodIndex > -1) {
+          inventory.splice(foodIndex, 1);
+          let hungerIncrease, happinessIncrease = 0;
+          switch (food) {
+            case 'Apple':
+              hungerIncrease = 10;
+              break;
+            case 'Cookie':
+              hungerIncrease = 10;
+              happinessIncrease = 10;
+              break;
+            case 'Pizza':
+              hungerIncrease = 30;
+              break;
+            default:
+              res.send('Invalid food item. <a href="/home">Try again</a>');
+              return;
+          }
+
+          // Cap hunger and happiness at 100
+          const newHunger = Math.min(row.hunger + hungerIncrease, 100);
+          const newHappiness = Math.min(row.happiness + happinessIncrease, 100);
+
+          db.run("UPDATE pets SET hunger = ?, happiness = ?, inventory = ? WHERE username = ?", [newHunger, newHappiness, JSON.stringify(inventory), req.session.user], (err) => {
+            if (err) {
+              console.error("Database error:", err);
+              res.send('Error occurred. <a href="/home">Try again</a>');
+            } else {
+              res.redirect('/home');
+            }
+          });
+        } else {
+          res.send('Food item not found in inventory. <a href="/home">Try again</a>');
+        }
+      } else {
+        res.send('User not found. <a href="/home">Try again</a>');
       }
     });
   } else {
@@ -227,6 +408,48 @@ app.post('/pet', (req, res) => {
         res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
       } else {
         res.redirect('/home');
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.get('/cloths-shop', (req, res) => {
+  if (req.session.user) {
+    res.render('cloths-shop');
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.post('/cloths-shop', (req, res) => {
+  const { outfit } = req.body;
+  if (req.session.user) {
+    db.get("SELECT coins, owned_outfits FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        res.send('Error occurred. <a href="/cloths-shop">Try again</a>');
+      } else if (row) {
+        if (row.coins >= 10) { // Assuming each outfit costs 10 coins
+          const ownedOutfits = row.owned_outfits ? row.owned_outfits.split(',') : ['default'];
+          if (!ownedOutfits.includes(outfit)) {
+            ownedOutfits.push(outfit);
+            const updatedOutfits = ownedOutfits.join(',');
+            db.run("UPDATE pets SET coins = coins - 10, owned_outfits = ? WHERE username = ?", [updatedOutfits, req.session.user], (err) => {
+              if (err) {
+                res.send('Error occurred. <a href="/cloths-shop">Try again</a>');
+              } else {
+                res.redirect('/home');
+              }
+            });
+          } else {
+            res.send('You already own this outfit. <a href="/cloths-shop">Try again</a>');
+          }
+        } else {
+          res.send('Not enough coins. <a href="/cloths-shop">Try again</a>');
+        }
+      } else {
+        res.send('User not found. <a href="/cloths-shop">Try again</a>');
       }
     });
   } else {

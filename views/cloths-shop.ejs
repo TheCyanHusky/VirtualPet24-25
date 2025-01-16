@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop</title>
+  <title>Clothes Shop</title>
   <style>
     body {
       display: flex;
@@ -28,11 +28,17 @@
       margin-bottom: 20px;
     }
 
-    .shop-options {
+    .outfit-options {
       display: flex;
       justify-content: space-around;
       width: 100%;
       margin-bottom: 20px;
+    }
+
+    .outfit-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     button {
@@ -55,15 +61,21 @@
 
 <body>
   <div class="container">
-    <h2>Shop</h2>
-    <div class="shop-options">
-      <form action="/cloths-shop" method="GET">
-        <button type="submit">Clothes Shop</button>
-      </form>
-      <form action="/food-shop" method="GET">
-        <button type="submit">Food Shop</button>
-      </form>
-    </div>
+    <h2>Clothes Shop</h2>
+    <p>Select an outfit for your pet (10 coins each):</p>
+    <form action="/cloths-shop" method="POST">
+      <div class="outfit-options">
+        <div class="outfit-option">
+          <input type="radio" id="tophat" name="outfit" value="Top Hat" required>
+          <label for="tophat">Top Hat</label>
+        </div>
+        <div class="outfit-option">
+          <input type="radio" id="sunglasses" name="outfit" value="Sunglasses" required>
+          <label for="sunglasses">Sunglasses</label>
+        </div>
+      </div>
+      <button type="submit">Buy Outfit</button>
+    </form>
     <form action="/home" method="GET">
       <button type="submit">Back to Home</button>
     </form>
