@@ -4,63 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       align-items: center;
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
+      border-color: #000;
+      border: none;
+      border-radius: 5px;
     }
+
+    .title-screen {
+      position: relative;
+      width: 450px;
+      height: 125px;
+      object-fit: contain;
+      background: url('/images/TBG.png') no-repeat center center;
+      background-size: contain;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .title-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Press Start 2P', sans-serif;
+      font-size: 26px;
+      color: white;
+      text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+    }
+
+
     .container {
       background-color: #fff;
-      padding: 20px;
+      padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
+      margin-top: 20px;
+      width: 90%;
+      max-width: 400px;
     }
+
     h2 {
       margin-bottom: 20px;
+      font-size: 24px;
     }
+
     form {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     input {
       margin: 10px;
-      padding: 10px;
+      padding: 15px;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 16px;
       width: 100%;
       max-width: 300px;
     }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 300px;
+    }
+
     button {
       margin: 10px;
-      padding: 10px 20px;
+      padding: 15px 30px;
       border: none;
       border-radius: 5px;
       background-color: #007bff;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.3s;
     }
+
     button:hover {
       background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .back-button {
+      background-color: #6c757d;
+    }
+
+    .back-button:hover {
+      background-color: #5a6268;
     }
   </style>
 </head>
 <body>
+  <div class="title-screen">
+    <h1 class="title-text">Petble</h1>
+  </div>
   <div class="container">
     <h2>Login</h2>
     <form action="/login" method="POST">
       <input type="text" name="username" placeholder="Username" required>
       <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login</button>
+      <div class="button-group">
+        <button type="submit">Login</button>
+        <button class="back-button" onclick="window.location.href='/'">Back</button>
+      </div>
     </form>
   </div>
 </body>

@@ -8,44 +8,95 @@
   <style>
     body {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background-color: #f0f0f0;
     }
 
+    .logout-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff0000;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .logout-button:hover {
+      background-color: #cc0000;
+    }
+
     .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background-color: #fff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      margin-top: 20px;
+      width: 80%;
+      max-width: 1000px;
     }
 
-    h2 {
+    .content {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .pet-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .pet-image {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
       margin-bottom: 20px;
     }
 
-    .inventory-container {
+    .stats-section {
+      flex: 1;
+      padding-left: 20px;
+    }
+
+    .bar-container {
       width: 100%;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .bar {
+      height: 20px;
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    .inventory-container {
+      flex: 1;
       background-color: #fff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      display: none;
     }
 
     .inventory {
       display: flex;
-      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
       margin-bottom: 20px;
     }
@@ -54,10 +105,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin-bottom: 10px;
     }
 
     button {
-      margin: 10px;
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
@@ -77,81 +128,132 @@
       cursor: not-allowed;
     }
 
-    .bar-container {
-      width: 100%;
-      background-color: #ddd;
-      border-radius: 5px;
-      overflow: hidden;
+    h1, h2, h3, p {
       margin: 10px 0;
     }
 
-    .bar {
-      height: 20px;
-      transition: width 0.3s, background-color 0.3s;
+    h1 {
+      color: #007bff;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    h3 {
+      color: #555;
+    }
+
+    p {
+      color: #666;
+    }
+
+    .name-plate {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .name-plate h2 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    .nametag-box {
+      border: 2px solid #dfddd5; /* Change the color as needed */
+      padding: 5px;
+      display: inline-block;
+      border-radius: 5px;
+      background-color: #dfddd5; /* Optional: add a background color */
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .action-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .action-button:hover {
+      background-color: #0056b3;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
 
 <body>
+  <button class="logout-button" onclick="location.href='/'">Logout</button>
   <div class="container">
     <h1>Welcome <%= user %>!</h1>
-    <h2>Your Pet</h2>
-    <% let petImage=`/images/${pet.pet_type.toLowerCase()}.png`; %>
-    <% if (pet.current_outfit==='Top Hat' ) { %>
-    <% petImage=`/images/${pet.pet_type.toLowerCase()}2.png`; %>
-    <% } else if (pet.current_outfit==='Sunglasses' ) { %>
-    <% petImage=`/images/${pet.pet_type.toLowerCase()}3.png`; %>
-    <% } %>
-    <img src="<%= petImage %>" alt="<%= pet.pet_type %>">
-    <p>Name: <%= pet.pet_name %></p>
-    <div class="bar-container">
-      <div id="hunger-bar" class="bar"></div>
+    <div class="content">
+      <div class="inventory-container">
+        <h3>Inventory</h3>
+        <form action="/feed" method="POST">
+          <div class="inventory">
+            <% if (pet.inventory && pet.inventory !== '[]') { %>
+              <% let inventory = JSON.parse(pet.inventory); %>
+              <% inventory.forEach(function(item) { %>
+                <div class="food-item">
+                  <input type="radio" id="<%= item %>" name="food" value="<%= item %>" required>
+                  <label for="<%= item %>">
+                    <img src="/images/<%= item.toLowerCase() %>.png" alt="<%= item %>" style="width:50px;height:50px;">
+                    <%= item %>
+                  </label>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p>No food items in inventory.</p>
+            <% } %>
+          </div>
+          <button type="submit">Feed</button>
+        </form>
+      </div>
+      <div class="pet-section">
+        <% let petImage=`/images/${pet.pet_type.toLowerCase()}.png`; %>
+        <% if (pet.current_outfit==='Top Hat' ) { %>
+        <% petImage=`/images/${pet.pet_type.toLowerCase()}2.png`; %>
+        <% } else if (pet.current_outfit==='Sunglasses' ) { %>
+        <% petImage=`/images/${pet.pet_type.toLowerCase()}3.png`; %>
+        <% } %>
+        <img src="<%= petImage %>" alt="<%= pet.pet_type %>" class="pet-image">
+        <div class="name-plate">
+          <div class="nametag-box">
+            <h2><%= pet.pet_name %></h2>
+          </div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="bar-container">
+          <div id="hunger-bar" class="bar"></div>
+        </div>
+        <p>Hunger: <span id="hunger-value"><%= Math.min(pet.hunger, 100) %></span></p>
+        <div class="bar-container">
+          <div id="happiness-bar" class="bar"></div>
+        </div>
+        <p>Happiness: <span id="happiness-value"><%= Math.min(pet.happiness, 100) %></span></p>
+        <p>Outfit: <%= pet.current_outfit %></p>
+        <p>Personality: <%= pet.personality %></p>
+        <p>Coins: <%= pet.coins %></p>
+      </div>
     </div>
-    <p>Hunger: <span id="hunger-value"><%= Math.min(pet.hunger, 100) %></span></p>
-    <div class="bar-container">
-      <div id="happiness-bar" class="bar"></div>
-    </div>
-    <p>Happiness: <span id="happiness-value"><%= Math.min(pet.happiness, 100) %></span></p>
-    <p>Outfit: <%= pet.current_outfit %></p>
-    <p>Personality: <%= pet.personality %></p>
-    <p>Coins: <%= pet.coins %></p>
-    <p>Hunger Decrease Rate: 
-      <% switch (pet.personality) {
-        case 'Playful': %> 2 <% break;
-        case 'Lazy': %> 3 <% break;
-        case 'Curious': %> 1 <% break;
-        case 'Energetic': %> 4 <% break;
-        case 'Calm': %> 1 <% break;
-        case 'Greedy': %> 5 <% break;
-        case 'Cheerful': %> 2 <% break;
-        case 'Depressed': %> 5 <% break;
-        default: %> 2 <% break;
-      } %>
-    </p>
-    <p>Happiness Decrease Rate: 
-      <% switch (pet.personality) {
-        case 'Playful': %> 1 <% break;
-        case 'Lazy': %> 1 <% break;
-        case 'Curious': %> 3 <% break;
-        case 'Energetic': %> 1 <% break;
-        case 'Calm': %> 1 <% break;
-        case 'Greedy': %> 2 <% break;
-        case 'Cheerful': %> 1 <% break;
-        case 'Depressed': %> 10 <% break;
-        default: %> 2 <% break;
-      } %>
-    </p>
     <div class="actions">
-      <button type="button" onclick="toggleInventory()" <%= pet.hunger >= 100 ? 'disabled' : '' %>>Feed</button>
-      <form action="/pet" method="POST">
-        <button type="submit">Pet</button>
-      </form>
-      <form action="/play" method="POST">
-        <button type="submit">Play</button>
-      </form>
-      <form action="/shop" method="GET">
-        <button type="submit">Shop</button>
-      </form>
       <form action="/change-outfit" method="POST">
         <select name="outfit" required>
           <option value="default" <%=pet.current_outfit==='default' ? 'selected' : '' %>>Default</option>
@@ -160,34 +262,11 @@
           </option>
           <% }); %>
         </select>
-        <button type="submit">Change Outfit</button>
+        <button type="submit" class="action-button">Change Outfit</button>
       </form>
+      <button class="action-button" onclick="location.href='/play'">Play</button>
+      <button class="action-button" onclick="location.href='/shop'">Shop</button>
     </div>
-    <div id="pet" ondrop="drop(event)" ondragover="allowDrop(event)">
-      <h3>Drag food here to feed your pet</h3>
-    </div>
-  </div>
-  <div class="inventory-container" id="inventory-container">
-    <h3>Inventory</h3>
-    <form action="/feed" method="POST">
-      <div class="inventory">
-        <% if (pet.inventory && pet.inventory !== '[]') { %>
-          <% let inventory = JSON.parse(pet.inventory); %>
-          <% inventory.forEach(function(item) { %>
-            <div class="food-item">
-              <input type="radio" id="<%= item %>" name="food" value="<%= item %>" required>
-              <label for="<%= item %>">
-                <img src="/images/<%= item.toLowerCase() %>.png" alt="<%= item %>" style="width:50px;height:50px;">
-                <%= item %>
-              </label>
-            </div>
-          <% }); %>
-        <% } else { %>
-          <p>No food items in inventory.</p>
-        <% } %>
-      </div>
-      <button type="submit">Feed</button>
-    </form>
   </div>
   <script>
     function toggleInventory() {
