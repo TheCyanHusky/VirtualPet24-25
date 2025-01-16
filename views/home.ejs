@@ -12,11 +12,80 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background-color: #f0f0f0;
     }
 
+    .logout-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff0000;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .logout-button:hover {
+      background-color: #cc0000;
+    }
+
     .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 1000px;
+    }
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .pet-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .pet-image {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+
+    .stats-section {
+      flex: 1;
+      padding-left: 20px;
+    }
+
+    .bar-container {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .bar {
+      height: 20px;
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    .inventory-container {
+      flex: 1;
       background-color: #fff;
       padding: 20px;
       border-radius: 10px;
@@ -24,34 +93,22 @@
       text-align: center;
     }
 
-    h1,
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    img {
-      max-width: 300px;
-      /* Set the maximum width */
-      max-height: 300px;
-      /* Set the maximum height */
-      width: 100%;
-      /* Maintain aspect ratio */
-      height: 100%;
-      /* Maintain aspect ratio */
-      object-fit: contain;
-      /* Maintain aspect ratio and fit within the container */
-      margin-bottom: 20px;
-    }
-
-    .actions {
+    .inventory {
       display: flex;
-      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
       margin-bottom: 20px;
+    }
+
+    .food-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
     button {
-      margin: 10px;
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
@@ -65,58 +122,231 @@
     button:hover {
       background-color: #0056b3;
     }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    h1, h2, h3, p {
+      margin: 10px 0;
+    }
+
+    h1 {
+      color: #007bff;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    h3 {
+      color: #555;
+    }
+
+    p {
+      color: #666;
+    }
+
+    .name-plate {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .name-plate h2 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    .nametag-box {
+      border: 2px solid #dfddd5; /* Change the color as needed */
+      padding: 5px;
+      display: inline-block;
+      border-radius: 5px;
+      background-color: #dfddd5; /* Optional: add a background color */
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .action-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .action-button:hover {
+      background-color: #0056b3;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 
 <body>
+  <button class="logout-button" onclick="location.href='/'">Logout</button>
   <div class="container">
     <h1>Welcome <%= user %>!</h1>
-    <h2>Your Pet</h2>
-    <% let petImage=`/images/${pet.pet_type.toLowerCase()}.png`; %>
-      <% if (pet.current_outfit==='Top Hat' ) { %>
-        <% petImage=`/images/${pet.pet_type.toLowerCase()}2.png`; %>
-          <% } else if (pet.current_outfit==='Sunglasses' ) { %>
-            <% petImage=`/images/${pet.pet_type.toLowerCase()}3.png`; %>
-              <% } %>
-                <img src="<%= petImage %>" alt="<%= pet.pet_type %>">
-                <p>Name: <%= pet.pet_name %>
-                </p>
-                <p>Hunger: <%= pet.hunger %>
-                </p>
-                <p>Happiness: <%= pet.happiness %>
-                </p>
-                <p>Outfit: <%= pet.current_outfit %>
-                </p>
-                <p>Personality: <%= pet.personality %>
-                </p>
-                <p>Coins: <%= pet.coins %>
-                </p>
-                <div class="actions">
-                  <form action="/feed" method="POST">
-                    <button type="submit">Feed</button>
-                  </form>
-                  <form action="/pet" method="POST">
-                    <button type="submit">Pet</button>
-                  </form>
-                  <form action="/play" method="POST">
-                    <button type="submit">Play</button>
-                  </form>
-                  <form action="/shop" method="GET">
-                    <button type="submit">Shop</button>
-                  </form>
-                  <form action="/change-outfit" method="POST">
-                    <select name="outfit" required>
-                      <option value="default" <%=pet.current_outfit==='default' ? 'selected' : '' %>>Default</option>
-                      <% ownedOutfits.forEach(outfit=> { %>
-                        <option value="<%= outfit %>" <%=pet.current_outfit===outfit ? 'selected' : '' %>><%=
-                            outfit.charAt(0).toUpperCase() + outfit.slice(1) %>
-                        </option>
-                        <% }); %>
-                    </select>
-                    <button type="submit">Change Outfit</button>
-                  </form>
+    <div class="content">
+      <div class="inventory-container">
+        <h3>Inventory</h3>
+        <form action="/feed" method="POST">
+          <div class="inventory">
+            <% if (pet.inventory && pet.inventory !== '[]') { %>
+              <% let inventory = JSON.parse(pet.inventory); %>
+              <% inventory.forEach(function(item) { %>
+                <div class="food-item">
+                  <input type="radio" id="<%= item %>" name="food" value="<%= item %>" required>
+                  <label for="<%= item %>">
+                    <img src="/images/<%= item.toLowerCase() %>.png" alt="<%= item %>" style="width:50px;height:50px;">
+                    <%= item %>
+                  </label>
                 </div>
+              <% }); %>
+            <% } else { %>
+              <p>No food items in inventory.</p>
+            <% } %>
+          </div>
+          <button type="submit">Feed</button>
+        </form>
+      </div>
+      <div class="pet-section">
+        <% let petImage=`/images/${pet.pet_type.toLowerCase()}.png`; %>
+        <% if (pet.current_outfit==='Top Hat' ) { %>
+        <% petImage=`/images/${pet.pet_type.toLowerCase()}2.png`; %>
+        <% } else if (pet.current_outfit==='Sunglasses' ) { %>
+        <% petImage=`/images/${pet.pet_type.toLowerCase()}3.png`; %>
+        <% } %>
+        <img src="<%= petImage %>" alt="<%= pet.pet_type %>" class="pet-image">
+        <div class="name-plate">
+          <div class="nametag-box">
+            <h2><%= pet.pet_name %></h2>
+          </div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="bar-container">
+          <div id="hunger-bar" class="bar"></div>
+        </div>
+        <p>Hunger: <span id="hunger-value"><%= Math.min(pet.hunger, 100) %></span></p>
+        <div class="bar-container">
+          <div id="happiness-bar" class="bar"></div>
+        </div>
+        <p>Happiness: <span id="happiness-value"><%= Math.min(pet.happiness, 100) %></span></p>
+        <p>Outfit: <%= pet.current_outfit %></p>
+        <p>Personality: <%= pet.personality %></p>
+        <p>Coins: <%= pet.coins %></p>
+      </div>
+    </div>
+    <div class="actions">
+      <form action="/change-outfit" method="POST">
+        <select name="outfit" required>
+          <option value="default" <%=pet.current_outfit==='default' ? 'selected' : '' %>>Default</option>
+          <% ownedOutfits.forEach(outfit=> { %>
+          <option value="<%= outfit %>" <%=pet.current_outfit===outfit ? 'selected' : '' %>><%= outfit.charAt(0).toUpperCase() + outfit.slice(1) %>
+          </option>
+          <% }); %>
+        </select>
+        <button type="submit" class="action-button">Change Outfit</button>
+      </form>
+      <button class="action-button" onclick="location.href='/play'">Play</button>
+      <button class="action-button" onclick="location.href='/shop'">Shop</button>
+    </div>
   </div>
+  <script>
+    function toggleInventory() {
+      var inventoryContainer = document.getElementById('inventory-container');
+      if (inventoryContainer.style.display === 'none' || inventoryContainer.style.display === '') {
+        inventoryContainer.style.display = 'block';
+      } else {
+        inventoryContainer.style.display = 'none';
+      }
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.getAttribute("data-food"));
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var food = ev.dataTransfer.getData("text");
+      fetch('/use-food', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ food: food })
+      }).then(response => {
+        if (response.ok) {
+          location.reload();
+        } else {
+          alert('Error occurred. Try again.');
+        }
+      });
+    }
+
+    document.querySelectorAll('.food-item').forEach(item => {
+      item.addEventListener('dragstart', drag);
+    });
+
+    function getColor(value) {
+      if (value > 50) {
+        const green = 255;
+        const red = Math.floor(255 - (value - 50) * 5.1);
+        return `rgb(${red}, ${green}, 0)`;
+      } else {
+        const green = Math.floor(value * 5.1);
+        const red = 255;
+        return `rgb(${red}, ${green}, 0)`;
+      }
+    }
+
+    function updateBars() {
+      fetch('/pet-status')
+        .then(response => response.json())
+        .then(data => {
+          const hungerValue = data.hunger;
+          const happinessValue = data.happiness;
+
+          console.log('Hunger:', hungerValue, 'Happiness:', happinessValue); // Debugging
+
+          document.getElementById('hunger-value').innerText = hungerValue;
+          document.getElementById('happiness-value').innerText = happinessValue;
+
+          const hungerBar = document.getElementById('hunger-bar');
+          const happinessBar = document.getElementById('happiness-bar');
+
+          hungerBar.style.width = hungerValue + '%';
+          hungerBar.style.backgroundColor = getColor(hungerValue);
+
+          happinessBar.style.width = happinessValue + '%';
+          happinessBar.style.backgroundColor = getColor(happinessValue);
+        })
+        .catch(error => console.error('Error fetching pet status:', error)); // Debugging
+    }
+
+    updateBars();
+    setInterval(updateBars, 1000);
+  </script>
 </body>
 
 </html>

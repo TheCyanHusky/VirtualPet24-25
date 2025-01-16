@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Shop</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .food-options {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .food-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .food-option img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .tooltip {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%; /* Position the tooltip above the text */
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    }
+
+    .food-option:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Food Shop</h2>
+    <p>Select food for your pet:</p>
+    <form action="/food-shop" method="POST">
+      <div class="food-options">
+        <div class="food-option">
+          <input type="radio" id="apple" name="food" value="Apple" required>
+          <label for="apple">
+            <img src="/images/apple.png" alt="Apple">
+            Apple
+            <div class="tooltip">Cost: 6 coins<br>Gives: +10 hunger</div>
+          </label>
+        </div>
+        <div class="food-option">
+          <input type="radio" id="cookie" name="food" value="Cookie" required>
+          <label for="cookie">
+            <img src="/images/cookie.png" alt="Cookie">
+            Cookie
+            <div class="tooltip">Cost: 12 coins<br>Gives: +10 hunger, +10 happiness</div>
+          </label>
+        </div>
+        <div class="food-option">
+          <input type="radio" id="pizza" name="food" value="Pizza" required>
+          <label for="pizza">
+            <img src="/images/pizza.png" alt="Pizza">
+            Pizza
+            <div class="tooltip">Cost: 20 coins<br>Gives: +30 hunger</div>
+          </label>
+        </div>
+      </div>
+      <button type="submit">Buy Food</button>
+    </form>
+    <form action="/home" method="GET">
+      <button type="submit">Back to Home</button>
+    </form>
+  </div>
+</body>
+
+</html>
