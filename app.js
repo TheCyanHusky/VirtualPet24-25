@@ -218,12 +218,19 @@ app.get('/home', (req, res) => {
 
 app.get('/play', (req, res) => {
   if (req.session.user) {
-    res.render('play');
+    db.get("SELECT * FROM pets WHERE username = ?", [req.session.user], (err, pet) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else if (pet) {
+        res.render('play', { pet });
+      } else {
+        res.redirect('/select-pet');
+      }
+    });
   } else {
     res.redirect('/');
   }
 });
-
 
 app.get('/shop', (req, res) => {
   if (req.session.user) {
