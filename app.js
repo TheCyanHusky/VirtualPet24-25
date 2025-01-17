@@ -218,7 +218,15 @@ app.get('/home', (req, res) => {
 
 app.get('/play', (req, res) => {
   if (req.session.user) {
-    res.render('play');
+    db.get("SELECT * FROM pets WHERE username = ?", [req.session.user], (err, pet) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else if (pet) {
+        res.render('play', { pet });
+      } else {
+        res.redirect('/select-pet');
+      }
+    });
   } else {
     res.redirect('/');
   }
@@ -226,15 +234,23 @@ app.get('/play', (req, res) => {
 
 app.post('/play', (req, res) => {
   if (req.session.user) {
-    db.run("UPDATE pets SET happiness = happiness + 10, coins = coins + 5 WHERE username = ?", [req.session.user], (err) => {
+    db.run("UPDATE pets SET coins = coins + 5 WHERE username = ?", [req.session.user], (err) => {
       if (err) {
-        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+        res.status(500).send('Error occurred while updating coins');
       } else {
-        res.redirect('/play');
+        db.get("SELECT * FROM pets WHERE username = ?", [req.session.user], (err, pet) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else if (pet) {
+            res.render('play', { pet });
+          } else {
+            res.redirect('/select-pet');
+          }
+        });
       }
     });
   } else {
-    res.redirect('/');
+    res.status(401).send('Unauthorized');
   }
 });
 
