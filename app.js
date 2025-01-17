@@ -224,19 +224,6 @@ app.get('/play', (req, res) => {
   }
 });
 
-app.post('/play', (req, res) => {
-  if (req.session.user) {
-    db.run("UPDATE pets SET happiness = happiness + 10, coins = coins + 5 WHERE username = ?", [req.session.user], (err) => {
-      if (err) {
-        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
-      } else {
-        res.redirect('/play');
-      }
-    });
-  } else {
-    res.redirect('/');
-  }
-});
 
 app.get('/shop', (req, res) => {
   if (req.session.user) {
@@ -395,19 +382,50 @@ app.post('/feed', (req, res) => {
     res.redirect('/');
   }
 });
-app.post('/pet', (req, res) => {
+
+app.post('/play', (req, res) => {
   if (req.session.user) {
-    db.run("UPDATE pets SET happiness = happiness + 10 WHERE username = ?", [req.session.user], (err) => {
+    db.get("SELECT happiness, coins FROM pets WHERE username = ?", [req.session.user], (err, row) => {
       if (err) {
         res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
       } else {
-        res.redirect('/home');
+        const newHappiness = Math.min(row.happiness + 10, 100);
+        const newCoins = row.coins + 5;
+        db.run("UPDATE pets SET happiness = ?, coins = ? WHERE username = ?", [newHappiness, newCoins, req.session.user], (err) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else {
+            res.redirect('/play');
+          }
+        });
       }
     });
   } else {
     res.redirect('/');
   }
 });
+
+app.post('/pet', (req, res) => {
+  if (req.session.user) {
+    db.get("SELECT happiness FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else {
+        const newHappiness = Math.min(row.happiness + 10, 100);
+        db.run("UPDATE pets SET happiness = ? WHERE username = ?", [newHappiness, req.session.user], (err) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else {
+            res.redirect('/home');
+          }
+        });
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
 
 app.get('/cloths-shop', (req, res) => {
   if (req.session.user) {
