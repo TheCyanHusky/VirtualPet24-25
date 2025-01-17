@@ -232,6 +232,28 @@ app.get('/play', (req, res) => {
   }
 });
 
+app.post('/play', (req, res) => {
+  if (req.session.user) {
+    db.get("SELECT happiness, coins FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else {
+        const newHappiness = Math.min(row.happiness + 10, 100);
+        const newCoins = row.coins + 5;
+        db.run("UPDATE pets SET happiness = ?, coins = ? WHERE username = ?", [newHappiness, newCoins, req.session.user], (err) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else {
+            res.redirect('/play');
+          }
+        });
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
 app.get('/shop', (req, res) => {
   if (req.session.user) {
     db.get("SELECT owned_outfits FROM pets WHERE username = ?", [req.session.user], (err, row) => {
