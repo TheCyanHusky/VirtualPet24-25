@@ -84,7 +84,7 @@
       transition: width 0.3s, background-color 0.3s;
     }
 
-    .inventory-container {
+    .food-shop {
       flex: 1;
       background-color: #fff;
       padding: 20px;
@@ -93,39 +93,45 @@
       text-align: center;
     }
 
-    .inventory {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
     .food-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 10px;
+      position: relative;
+      display: inline-block;
+      margin: 10px;
     }
 
-    button {
-      padding: 10px 20px;
+    .food-item button {
+      background: none;
       border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: #fff;
-      font-size: 16px;
+      padding: 0;
       cursor: pointer;
-      transition: background-color 0.3s;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .food-item img {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
     }
 
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
+    .tooltip {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .food-item:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
     }
 
     h1, h2, h3, p {
@@ -203,26 +209,27 @@
   <div class="container">
     <h1>Welcome <%= user %>!</h1>
     <div class="content">
-      <div class="inventory-container">
-        <h3>Inventory</h3>
+      <div class="food-shop">
+        <h3>Food Shop</h3>
         <form action="/feed" method="POST">
-          <div class="inventory">
-            <% if (pet.inventory && pet.inventory !== '[]') { %>
-              <% let inventory = JSON.parse(pet.inventory); %>
-              <% inventory.forEach(function(item) { %>
-                <div class="food-item">
-                  <input type="radio" id="<%= item %>" name="food" value="<%= item %>" required>
-                  <label for="<%= item %>">
-                    <img src="/images/<%= item.toLowerCase() %>.png" alt="<%= item %>" style="width:50px;height:50px;">
-                    <%= item %>
-                  </label>
-                </div>
-              <% }); %>
-            <% } else { %>
-              <p>No food items in inventory.</p>
-            <% } %>
+          <div class="food-item">
+            <button type="submit" name="food" value="Apple">
+              <img src="/images/apple.png" alt="Apple">
+              <div class="tooltip">Apple<br>Cost: 6 coins<br>+10 hunger</div>
+            </button>
           </div>
-          <button type="submit">Feed</button>
+          <div class="food-item">
+            <button type="submit" name="food" value="Cookie">
+              <img src="/images/cookie.png" alt="Cookie">
+              <div class="tooltip">Cookie<br>Cost: 12 coins<br>+10 hunger, +10 happiness</div>
+            </button>
+          </div>
+          <div class="food-item">
+            <button type="submit" name="food" value="Pizza">
+              <img src="/images/pizza.png" alt="Pizza">
+              <div class="tooltip">Pizza<br>Cost: 20 coins<br>+30 hunger</div>
+            </button>
+          </div>
         </form>
       </div>
       <div class="pet-section">
@@ -269,45 +276,6 @@
     </div>
   </div>
   <script>
-    function toggleInventory() {
-      var inventoryContainer = document.getElementById('inventory-container');
-      if (inventoryContainer.style.display === 'none' || inventoryContainer.style.display === '') {
-        inventoryContainer.style.display = 'block';
-      } else {
-        inventoryContainer.style.display = 'none';
-      }
-    }
-
-    function allowDrop(ev) {
-      ev.preventDefault();
-    }
-
-    function drag(ev) {
-      ev.dataTransfer.setData("text", ev.target.getAttribute("data-food"));
-    }
-
-    function drop(ev) {
-      ev.preventDefault();
-      var food = ev.dataTransfer.getData("text");
-      fetch('/use-food', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ food: food })
-      }).then(response => {
-        if (response.ok) {
-          location.reload();
-        } else {
-          alert('Error occurred. Try again.');
-        }
-      });
-    }
-
-    document.querySelectorAll('.food-item').forEach(item => {
-      item.addEventListener('dragstart', drag);
-    });
-
     function getColor(value) {
       if (value > 50) {
         const green = 255;

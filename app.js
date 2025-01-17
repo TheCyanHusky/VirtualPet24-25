@@ -362,42 +362,37 @@ app.post('/food-shop', (req, res) => {
 app.post('/feed', (req, res) => {
   const { food } = req.body;
   if (req.session.user) {
-    db.get("SELECT hunger, happiness, inventory FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+    db.get("SELECT coins, hunger, happiness FROM pets WHERE username = ?", [req.session.user], (err, row) => {
       if (err) {
         console.error("Database error:", err);
         res.send('Error occurred. <a href="/home">Try again</a>');
       } else if (row) {
-        if (row.hunger >= 100) {
-          res.send('Your pet is already full. <a href="/home">Go back</a>');
-          return;
+        let cost, hungerIncrease, happinessIncrease = 0;
+        switch (food) {
+          case 'Apple':
+            cost = 6;
+            hungerIncrease = 10;
+            break;
+          case 'Cookie':
+            cost = 12;
+            hungerIncrease = 10;
+            happinessIncrease = 10;
+            break;
+          case 'Pizza':
+            cost = 20;
+            hungerIncrease = 30;
+            break;
+          default:
+            res.send('Invalid food item. <a href="/home">Try again</a>');
+            return;
         }
 
-        let inventory = row.inventory ? JSON.parse(row.inventory) : [];
-        const foodIndex = inventory.indexOf(food);
-        if (foodIndex > -1) {
-          inventory.splice(foodIndex, 1);
-          let hungerIncrease, happinessIncrease = 0;
-          switch (food) {
-            case 'Apple':
-              hungerIncrease = 10;
-              break;
-            case 'Cookie':
-              hungerIncrease = 10;
-              happinessIncrease = 10;
-              break;
-            case 'Pizza':
-              hungerIncrease = 30;
-              break;
-            default:
-              res.send('Invalid food item. <a href="/home">Try again</a>');
-              return;
-          }
-
+        if (row.coins >= cost) {
           // Cap hunger and happiness at 100
           const newHunger = Math.min(row.hunger + hungerIncrease, 100);
           const newHappiness = Math.min(row.happiness + happinessIncrease, 100);
 
-          db.run("UPDATE pets SET hunger = ?, happiness = ?, inventory = ? WHERE username = ?", [newHunger, newHappiness, JSON.stringify(inventory), req.session.user], (err) => {
+          db.run("UPDATE pets SET coins = coins - ?, hunger = ?, happiness = ? WHERE username = ?", [cost, newHunger, newHappiness, req.session.user], (err) => {
             if (err) {
               console.error("Database error:", err);
               res.send('Error occurred. <a href="/home">Try again</a>');
@@ -406,7 +401,7 @@ app.post('/feed', (req, res) => {
             }
           });
         } else {
-          res.send('Food item not found in inventory. <a href="/home">Try again</a>');
+          res.send('Not enough coins. <a href="/home">Try again</a>');
         }
       } else {
         res.send('User not found. <a href="/home">Try again</a>');
@@ -417,19 +412,49 @@ app.post('/feed', (req, res) => {
   }
 });
 
-app.post('/pet', (req, res) => {
+app.post('/play', (req, res) => {
   if (req.session.user) {
-    db.run("UPDATE pets SET happiness = happiness + 10 WHERE username = ?", [req.session.user], (err) => {
+    db.get("SELECT happiness, coins FROM pets WHERE username = ?", [req.session.user], (err, row) => {
       if (err) {
         res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
       } else {
-        res.redirect('/home');
+        const newHappiness = Math.min(row.happiness + 10, 100);
+        const newCoins = row.coins + 5;
+        db.run("UPDATE pets SET happiness = ?, coins = ? WHERE username = ?", [newHappiness, newCoins, req.session.user], (err) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else {
+            res.redirect('/play');
+          }
+        });
       }
     });
   } else {
     res.redirect('/');
   }
 });
+
+app.post('/pet', (req, res) => {
+  if (req.session.user) {
+    db.get("SELECT happiness FROM pets WHERE username = ?", [req.session.user], (err, row) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else {
+        const newHappiness = Math.min(row.happiness + 10, 100);
+        db.run("UPDATE pets SET happiness = ? WHERE username = ?", [newHappiness, req.session.user], (err) => {
+          if (err) {
+            res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+          } else {
+            res.redirect('/home');
+          }
+        });
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
 
 app.get('/cloths-shop', (req, res) => {
   if (req.session.user) {
