@@ -55,7 +55,7 @@ app.get('/signup', (req, res) => {
 
 // Function to decrease hunger and happiness based on personality
 function decreaseHungerAndHappiness() {
-  db.all("SELECT username, personality, hunger, happiness FROM pets", (err, rows) => {
+  db.all("SELECT username, personality, hunger, happiness FROM pets WHERE username IN (SELECT username FROM users WHERE online = 'true')", (err, rows) => {
     if (err) {
       console.error("Database error:", err);
       return;
@@ -151,13 +151,19 @@ app.post('/login', (req, res) => {
             const hashPassword = derivedKey.toString('hex');
             if (row.password === hashPassword) {
               req.session.user = username;
-              db.get("SELECT * FROM pets WHERE username = ?", [username], (err, pet) => {
+              db.run("UPDATE users SET online = 'true' WHERE username = ?", [username], (err) => {
                 if (err) {
                   res.send('Error occurred. <a href="/login">Try again</a>' + "  " + err);
-                } else if (pet) {
-                  res.redirect('/home');
                 } else {
-                  res.redirect('/select-pet');
+                  db.get("SELECT * FROM pets WHERE username = ?", [username], (err, pet) => {
+                    if (err) {
+                      res.send('Error occurred. <a href="/login">Try again</a>' + "  " + err);
+                    } else if (pet) {
+                      res.redirect('/home');
+                    } else {
+                      res.redirect('/select-pet');
+                    }
+                  });
                 }
               });
             } else {
@@ -190,7 +196,7 @@ app.post('/signup', (req, res) => {
             res.send('Error hashing password: \n' + err);
           } else {
             const hashPassword = derivedKey.toString('hex');
-            db.run('INSERT INTO users (username, password, salt) VALUES (?, ?, ?)', [username, hashPassword, salt], (err) => {
+            db.run('INSERT INTO users (username, password, salt, online) VALUES (?, ?, ?, ?)', [username, hashPassword, salt, 'true'], (err) => {
               if (err) {
                 res.send('Database error:\n' + err);
               } else {
@@ -548,8 +554,18 @@ app.post('/change-outfit', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  if (req.session.user) {
+    db.run("UPDATE users SET online = 'false' WHERE username = ?", [req.session.user], (err) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else {
+        req.session.destroy();
+        res.redirect('/');
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
 });
 
 app.listen(port, () => {
