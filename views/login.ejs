@@ -42,7 +42,6 @@
       text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
     }
 
-
     .container {
       background-color: #fff;
       padding: 30px;
@@ -114,14 +113,28 @@
   </div>
   <div class="container">
     <h2>Login</h2>
-    <form action="/login" method="POST">
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
+    <form id="login-form" action="/login" method="POST" onsubmit="return validateLoginForm()">
+      <input type="text" id="username" name="username" placeholder="Username" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
       <div class="button-group">
         <button type="submit">Login</button>
-        <button class="back-button" onclick="window.location.href='/'">Back</button>
+        <button type="button" class="back-button" onclick="window.location.href='/'">Back</button>
       </div>
     </form>
   </div>
+
+  <script>
+    function validateLoginForm() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        alert('Please fill out both fields.');
+        return false;
+      }
+
+      return true;
+    }
+  </script>
 </body>
 </html>

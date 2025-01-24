@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 3000;
@@ -133,44 +135,76 @@ setInterval(decreaseHungerAndHappiness, 20000);
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  db.get("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, row) => {
-    if (err) {
-      res.send('Error occurred. <a href="/login">Try again</a>' + "  " + err);
-    } else if (row) {
-      req.session.user = username;
-      db.get("SELECT * FROM pets WHERE username = ?", [username], (err, pet) => {
-        if (err) {
-          res.send('Error occurred. <a href="/login">Try again</a>' + "  " + err);
-        } else if (pet) {
-          res.redirect('/home');
-        } else {
-          res.redirect('/select-pet');
-        }
-      });
-    } else {
-      res.send('Invalid username or password. <a href="/login">Try again</a>');
-    }
-  });
+  if (username && password) {
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+      if (err) {
+        console.error(err);
+        res.send("There was an error:\n" + err);
+      } else if (!row) {
+        res.send('Invalid username or password. <a href="/login">Try again</a>');
+      } else {
+        // Compare stored password with provided password
+        crypto.pbkdf2(password, row.salt, 1000, 64, 'sha512', (err, derivedKey) => {
+          if (err) {
+            res.send('Error hashing password: \n' + err);
+          } else {
+            const hashPassword = derivedKey.toString('hex');
+            if (row.password === hashPassword) {
+              req.session.user = username;
+              db.get("SELECT * FROM pets WHERE username = ?", [username], (err, pet) => {
+                if (err) {
+                  res.send('Error occurred. <a href="/login">Try again</a>' + "  " + err);
+                } else if (pet) {
+                  res.redirect('/home');
+                } else {
+                  res.redirect('/select-pet');
+                }
+              });
+            } else {
+              res.send('Invalid username or password. <a href="/login">Try again</a>');
+            }
+          }
+        });
+      }
+    });
+  } else {
+    res.send("You need a username and password. <a href='/login'>Try again</a>");
+  }
 });
 
 app.post('/signup', (req, res) => {
   const { username, password } = req.body;
-  db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {
-    if (err) {
-      res.send('Error occurred. <a href="/signup">Try again</a>');
-    } else if (row) {
-      res.send('Username already taken. <a href="/signup">Try again</a>');
-    } else {
-      db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, password], (err) => {
-        if (err) {
-          res.send('Error occurred. <a href="/signup">Try again</a>');
-        } else {
-          req.session.user = username;
-          res.redirect('/select-pet');
-        }
-      });
-    }
-  });
+  if (username && password) {
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+      if (err) {
+        console.error(err);
+        res.send("There was an error:\n" + err);
+      } else if (row) {
+        res.send('Username already taken. <a href="/signup">Try again</a>');
+      } else {
+        // Create a new salt
+        const salt = crypto.randomBytes(16).toString('hex');
+        // Use the salt to hash the password
+        crypto.pbkdf2(password, salt, 1000, 64, 'sha512', (err, derivedKey) => {
+          if (err) {
+            res.send('Error hashing password: \n' + err);
+          } else {
+            const hashPassword = derivedKey.toString('hex');
+            db.run('INSERT INTO users (username, password, salt) VALUES (?, ?, ?)', [username, hashPassword, salt], (err) => {
+              if (err) {
+                res.send('Database error:\n' + err);
+              } else {
+                req.session.user = username;
+                res.redirect('/select-pet');
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    res.send("You need a username and password. <a href='/signup'>Try again</a>");
+  }
 });
 
 app.get('/select-pet', (req, res) => {

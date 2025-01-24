@@ -42,7 +42,6 @@
       text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
     }
 
-
     .container {
       background-color: #fff;
       padding: 30px;
@@ -114,14 +113,33 @@
   </div>
   <div class="container">
     <h2>Sign Up</h2>
-    <form action="/signup" method="POST">
-      <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
+    <form id="signup-form" action="/signup" method="POST" onsubmit="return validateSignupForm()">
+      <input type="text" id="username" name="username" placeholder="Username" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
       <div class="button-group">
         <button type="submit">Sign Up</button>
-        <button class="back-button" onclick="window.location.href='/'">Back</button>
+        <button type="button" class="back-button" onclick="window.location.href='/'">Back</button>
       </div>
     </form>
   </div>
+
+  <script>  
+    function validateSignupForm() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        alert('Please fill out both fields.');
+        return false;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        return false;
+      }
+
+      return true;
+    }
+  </script>
 </body>
 </html>
