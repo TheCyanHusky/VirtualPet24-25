@@ -262,7 +262,23 @@ app.get('/play', (req, res) => {
       if (err) {
         res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
       } else if (pet) {
-        res.render('play', { pet });
+        res.render('play', { userName: req.session.user, petName: pet.pet_name });
+      } else {
+        res.redirect('/select-pet');
+      }
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.get('/tag', (req, res) => {
+  if (req.session.user) {
+    db.get("SELECT * FROM pets WHERE username = ?", [req.session.user], (err, pet) => {
+      if (err) {
+        res.send('Error occurred. <a href="/home">Try again</a>' + "  " + err);
+      } else if (pet) {
+        res.render('tag', { pet });
       } else {
         res.redirect('/select-pet');
       }
