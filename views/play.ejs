@@ -4,171 +4,213 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini-Game</title>
+  <title>Play</title>
   <style>
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
-      position: relative;
-      overflow: hidden; /* Prevent scroll bars */
+      width: 100%;
     }
 
-    .container {
+    .dialog-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .pet-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 90%; /* Set width to 90% of the screen */
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+
+    .pet-info img {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
+      margin-right: 20px;
+    }
+
+    .pet-details {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .dialog-box {
       background-color: #fff;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: center;
-      margin-top: 20px;
-      width: 90%;
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    button {
-      margin: 10px;
       padding: 20px;
+      width: 100%;
+      height: 250px;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .dialog-box .pet-name {
+      background-color: #007bff;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 18px;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .games-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 90%; /* Set width to 90% of the screen */
+      height: calc(100% - 200px);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .games-container button {
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      margin: 10px;
+      transition: transform 0.3s;
+      width: 200px; /* Adjust the width */
+      height: 200px; /* Adjust the height */
+    }
+
+    .games-container button:hover {
+      transform: scale(1.05);
+    }
+
+    .games-container button img {
+      width: 100%; /* Make the image fill the button */
+      height: 100%; /* Make the image fill the button */
+    }
+
+    .back-home-button {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 20px;
       border: none;
       background-color: #007bff;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s, transform 0.5s;
-      user-select: none; /* Prevent text selection */
+      transition: background-color 0.3s;
     }
 
-    button:hover {
+    .back-home-button:hover {
       background-color: #0056b3;
     }
-
-    #pet-button {
-      width: 210px;
-      height: 210px;
-      position: absolute;
-      background-size: 100%; /* Scale up the image */
-      background-position: center;
-      background-repeat: no-repeat;
-      background-color: transparent;
-      border: none; /* Remove border */
-    }
-
-    .moving-button-container {
-      position: relative;
-      width: 90%;
-      height: calc(100vh - 150px); /* Adjust height to leave space for the container */
-      overflow: hidden; /* Prevent scroll bars */
-      cursor: crosshair; /* Change cursor to crosshair */
-    }
-
-    .moving-button-container button {
-      cursor: crosshair; /* Change cursor to crosshair */
-    }
+    #dialog-text {
+    font-size: 24px; /* Increase the font size */
+    font-weight: bold; /* Make the text bold */
+  
+  }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h2>Mini-Game TAG</h2>
-    <form action="/home" method="GET">
-      <button type="submit">Back to Home</button>
-    </form>
+  <div class="dialog-container">
+    <div class="pet-info">
+      <img src="/images/otter.gif" alt="Otter">
+      <div class="pet-details">
+        <div class="dialog-box">
+          <div class="pet-name">Oz the Otter</div>
+          <p id="dialog-text"></p>
+        </div>
+      </div>
+    </div>
+    <div class="games-container">
+      <button onclick="location.href='/tag'">
+        <img src="/images/tag.png" alt="Play Tag" style="width: 70px; height: 50px;">
+      </button>
+      <!-- Add more buttons for other games here -->
+    </div>
   </div>
-  <div class="moving-button-container">
-    <form action="/play" method="POST">
-      <button id="pet-button" type="submit"></button>
-    </form>
-  </div>
+  <button class="back-home-button" onclick="location.href='/home'">Back to Home</button>
 
   <script>
-    const petType = '<%= pet.pet_type.toLowerCase() %>';
-    let currentOutfit = '<%= pet.current_outfit %>';
-    const petButton = document.getElementById('pet-button');
+    const userName = "<%= userName %>"; // Get the user's name from the server-side
+    const petName = "<%= petName %>"; // Get the pet's name from the server-side
+    const dialogOptions = [
+      `Welcome to the game, ${userName}! Let's have some fun with ${petName}!`,
+      `Ready to play, ${userName}? ${petName} is excited to start!`,
+      `Hello there, ${userName}! ${petName} is ready for some excitement!`,
+      `Let's dive into the game and have a blast with ${petName}, ${userName}!`,
+      `Get ready for an adventure, ${userName}! ${petName} can't wait to play!`,
+      `It's game time, ${userName}! ${petName} is eager to have some fun!`,
+      `Are you prepared for some fun, ${userName}? ${petName} is all set to play!`,
+      `Time to play, ${userName}! ${petName} is looking forward to it!`,
+      `Let's have a great time playing with ${petName}, ${userName}!`,
+      `Welcome to the game, ${userName}! Let's have some fun with ${petName}!`,
+      `Ready to play, ${userName}? ${petName} is excited to start!`,
+      `Hello there, ${userName}! ${petName} is ready for some excitement!`,
+      `Let's dive into the game and have a blast with ${petName}, ${userName}!`,
+      `Get ready for an adventure, ${userName}! ${petName} can't wait to play!`,
+      `It's game time, ${userName}! ${petName} is eager to have some fun!`,
+      `Are you prepared for some fun, ${userName}? ${petName} is all set to play!`,
+      `Time to play, ${userName}! ${petName} is looking forward to it!`,
+      `Let's have a great time playing with ${petName}, ${userName}!`,
+      `Welcome to the game, ${userName}! Let's have some fun with ${petName}!`,
+      `Ready to play, ${userName}? ${petName} is excited to start!`,
+      `Hello there, ${userName}! ${petName} is ready for some excitement!`,
+      `Let's dive into the game and have a blast with ${petName}, ${userName}!`,
+      `Get ready for an adventure, ${userName}! ${petName} can't wait to play!`,
+      `It's game time, ${userName}! ${petName} is eager to have some fun!`,
+      `Are you prepared for some fun, ${userName}? ${petName} is all set to play!`,
+      `Time to play, ${userName}! ${petName} is looking forward to it!`,
+      `Let's have a great time playing with ${petName}, ${userName}!`,
+     ` did you know the Tag game was created by matthew from the class of 2025 aint that cool ${userName}`,
+` hey ${userName} did you know i was the first npc made for the game petble`,
+` hey ${userName} did you know amber made most of the sprites for the game including the sprite for your pet ${petName}`,
+    ];
 
-    function setPetImage() {
-      let imagePath = `/images/${petType}`;
-      if (currentOutfit && currentOutfit !== 'default') {
-        switch (currentOutfit) {
-          case "Top Hat":
-            currentOutfit = '2';
-            break;
+    const dialogText = dialogOptions[Math.floor(Math.random() * dialogOptions.length)];
+    let index = 0;
 
-          case "Sunglasses":
-            currentOutfit = '3';
-            break;
-
-          default:
-            currentOutfit = '';
-            break;
-        }
-        imagePath += currentOutfit;
+    function typeWriter() {
+      if (index < dialogText.length) {
+        document.getElementById("dialog-text").innerHTML += dialogText.charAt(index);
+        index++;
+        setTimeout(typeWriter, 50); // Adjust the speed here
       }
-      imagePath += '.png';
-      console.log('Image Path:', imagePath); // Log the image path for debugging
-      petButton.style.backgroundImage = `url('${imagePath}')`;
     }
 
-    setPetImage();
-
-    let normalSpeed = true;
-
-    function moveButton() {
-      const button = document.getElementById('pet-button');
-      const container = document.querySelector('.moving-button-container');
-      const maxX = container.clientWidth - button.offsetWidth - 75;
-      const maxY = container.clientHeight - button.offsetHeight - 75;
-      const randomX = Math.floor(Math.random() * maxX) + 75;
-      const randomY = Math.floor(Math.random() * maxY) + 75;
-      const randomSpeed = (Math.random() * 2 + 0.5) * (normalSpeed ? 1 : 0.5); // Speed between 0.5s and 2.5s, faster when clicked
-
-      button.style.transitionDuration = `${randomSpeed}s`;
-      button.style.transform = `translate(${randomX}px, ${randomY}px)`;
-
-      // Reset speed to normal after moving
-      normalSpeed = true;
-    }
-
-    document.getElementById('pet-button').addEventListener('click', (event) => {
-      event.preventDefault(); // Prevent form submission
-      const button = event.target;
-      const container = document.querySelector('.moving-button-container');
-      const maxX = container.clientWidth - button.offsetWidth - 75;
-      const maxY = container.clientHeight - button.offsetHeight - 75;
-      const randomX = Math.floor(Math.random() * maxX) + 75;
-      const randomY = Math.floor(Math.random() * maxY) + 75;
-
-      button.style.transitionDuration = '0s';
-      button.style.transform = `translate(${randomX}px, ${randomY}px)`; // Move to random resting position
-      normalSpeed = false; // Increase speed temporarily
-      setTimeout(moveButton, 1); // Move again immediately
-
-      // Make AJAX request to update coins
-      fetch('/play', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
-        if (response.ok) {
-          console.log('Coins updated successfully');
-        } else {
-          console.error('Failed to update coins');
-        }
-      }).catch(error => {
-        console.error('Error:', error);
-      });
-    });
-
-    setInterval(moveButton, 2000); // Move every 2 seconds
+    window.onload = function() {
+      typeWriter();
+    };
   </script>
 </body>
-
 </html>
